@@ -1,0 +1,35 @@
+name: Build CosmWasm Contract
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
+
+      - name: Install cargo wasm tools
+        run: |
+          rustup target add wasm32-unknown-unknown
+
+      - name: Build contract (wasm)
+        run: |
+          cargo wasm
+
+      - name: Upload wasm artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: contract-wasm
+          path: target/wasm32-unknown-unknown/release/*.wasm
